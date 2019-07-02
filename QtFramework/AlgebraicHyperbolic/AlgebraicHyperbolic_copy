@@ -1,0 +1,70 @@
+/*
+#pragma once
+
+#include "Core/TensorProductSurfaces3.h"
+
+namespace cagd {
+
+class BezierPatch:public TensorProductSurface3
+    {
+    protected:
+
+    public:
+        BezierPatch();
+        GLboolean UBlendingFunctionValues(GLdouble u_knot, RowMatrix<GLdouble> &blending_values) const;
+        GLboolean VBlendingFunctionValues(GLdouble v_knot, RowMatrix<GLdouble> &blending_values) const;
+        GLboolean CalculatePartialDerivatives(GLuint maximum_order_of_partial_derivatives,
+                                              GLdouble u,
+                                              GLdouble v,
+                                              PartialDerivatives &pd) const;
+    };
+}
+*/
+
+#pragma once
+
+#include "../Core/TensorProductSurfaces3.h"
+
+namespace cagd
+{
+    class AlgebraicHyperbolicPatch: public TensorProductSurface3
+    {
+    protected:
+        // shape parameter
+        GLdouble            alpha;
+    public:
+        AlgebraicHyperbolicPatch(GLdouble alpha);
+        AlgebraicHyperbolicPatch();
+
+        // we have to implement pure virtual methods introduced in class TensorProductSurface3
+        GLboolean UBlendingFunctionValues(GLdouble u_knot, RowMatrix<GLdouble> &blending_values) const;
+        GLboolean VBlendingFunctionValues(GLdouble v_knot, RowMatrix<GLdouble> &blending_values) const;
+        GLboolean CalculatePartialDerivatives(GLuint maximum_order_of_partial_derivatives, GLdouble u, GLdouble v, PartialDerivatives &pd) const;
+
+        // ...
+
+    private:
+        GLdouble F2(GLdouble u) const
+        {
+            return ((alpha - u + sinh(alpha - u) + sinh(u) - sinh(alpha) + u*cosh(alpha) - alpha*cosh(u))*sinh(alpha))
+                        /((alpha - sinh(alpha))*(2*sinh(alpha) - alpha - alpha*cosh(alpha)));
+        }
+
+        GLdouble F3(GLdouble u) const
+        {
+            return (u - sinh(u))/(alpha - sinh(alpha));
+        }
+
+        GLdouble dF2(GLdouble u) const
+        {
+            return (sinh(alpha)*(cosh(alpha) - cosh(alpha - u) - alpha * sinh(u) + cosh(u) - 1))
+                    /((alpha - sinh(alpha))*(-alpha + 2 * sinh(alpha) + alpha * (-cosh(alpha))));
+        }
+
+        GLdouble dF3(GLdouble u) const
+        {
+            return (1 - cosh(u))/(alpha - sinh(alpha));
+        }
+    };
+
+}
